@@ -247,14 +247,25 @@ def load_real_examples():
         import pandas as pd
         import config as cfg
         import os
-        if os.path.exists(cfg.DEV_FILE):
-            df = pd.read_csv(cfg.DEV_FILE).dropna(subset=['tweet_text', 'image_path'])
-            # Grab 3 random rows
-            samples = df.sample(n=3, random_state=42)
+        
+        # Check default path first, then check Google Drive MiniDataset
+        dev_file = cfg.DEV_FILE
+        img_dir = cfg.IMAGE_DIR
+        
+        if not os.path.exists(dev_file):
+            dev_file = "/content/drive/MyDrive/MiniDataset/csv/test.csv"
+            img_dir = "/content/drive/MyDrive/MiniDataset/images"
+            
+        if os.path.exists(dev_file):
+            df = pd.read_csv(dev_file).dropna(subset=['tweet_text', 'image_path'])
+            # Grab up to 50 random rows for a good variety without crashing the UI
+            n_samples = min(50, len(df))
+            samples = df.sample(n=n_samples, random_state=42)
             ex_list = []
             for _, row in samples.iterrows():
-                img_path = os.path.join(cfg.IMAGE_DIR, row['image_path'])
-                ex_list.append([row['tweet_text'], img_path])
+                img_path = os.path.join(img_dir, row['image_path'])
+                if os.path.exists(img_path):
+                    ex_list.append([row['tweet_text'], img_path])
             if len(ex_list) > 0:
                 return ex_list
     except:
@@ -413,6 +424,7 @@ def build_ui():
                             gr.Examples(
                                 examples=load_real_examples(),
                                 inputs=[tweet_input, image_input],
+                                examples_per_page=5
                             )
         
                     # ── RIGHT COLUMN (PIPELINE ARCHITECTURE) ──
