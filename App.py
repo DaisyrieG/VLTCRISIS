@@ -242,6 +242,29 @@ def check_data(train_csv, dev_csv, test_csv, image_dir):
     return "\n".join(lines)
 
 
+def load_real_examples():
+    try:
+        import pandas as pd
+        import config as cfg
+        import os
+        if os.path.exists(cfg.DEV_FILE):
+            df = pd.read_csv(cfg.DEV_FILE).dropna(subset=['tweet_text', 'image_path'])
+            # Grab 3 random rows
+            samples = df.sample(n=3, random_state=42)
+            ex_list = []
+            for _, row in samples.iterrows():
+                img_path = os.path.join(cfg.IMAGE_DIR, row['image_path'])
+                ex_list.append([row['tweet_text'], img_path])
+            if len(ex_list) > 0:
+                return ex_list
+    except:
+        pass
+    return [
+        ["BREAKING: Massive flooding hits downtown Houston after severe storm. The water is rising fast and emergency responders are on boats! 🚨 #HoustonFlood #Emergency", "examples/flood.png"],
+        ["Devastating aftermath of the 7.8 magnitude earthquake in the city center. Buildings collapsed and rescue teams are on site. 🙏 #Earthquake #Disaster", "examples/earthquake.png"],
+        ["URGENT: Wildfires spreading rapidly across the hills, threatening local residential homes. Please evacuate immediately! 🔥 #WildfireAlert #Evacuate", "examples/wildfire.png"],
+    ]
+
 # ── Build UI ────────────────────────────────────────────────────────────────
 custom_theme = gr.themes.Soft(
     primary_hue="blue",
@@ -388,11 +411,7 @@ def build_ui():
                         with gr.Column(elem_classes="figma-card"):
                             gr.Markdown("### EXAMPLE SCENARIOS")
                             gr.Examples(
-                                examples=[
-                                    ["BREAKING: Massive flooding hits downtown Houston after severe storm. The water is rising fast and emergency responders are on boats! 🚨 #HoustonFlood #Emergency", "examples/flood.png"],
-                                    ["Devastating aftermath of the 7.8 magnitude earthquake in the city center. Buildings collapsed and rescue teams are on site. 🙏 #Earthquake #Disaster", "examples/earthquake.png"],
-                                    ["URGENT: Wildfires spreading rapidly across the hills, threatening local residential homes. Please evacuate immediately! 🔥 #WildfireAlert #Evacuate", "examples/wildfire.png"],
-                                ],
+                                examples=load_real_examples(),
                                 inputs=[tweet_input, image_input],
                             )
         
