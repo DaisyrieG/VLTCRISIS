@@ -243,8 +243,8 @@ def check_data(train_csv, dev_csv, test_csv, image_dir):
 
 # ── Build UI ────────────────────────────────────────────────────────────────
 custom_theme = gr.themes.Soft(
-    primary_hue="teal",
-    secondary_hue="emerald",
+    primary_hue="blue",
+    secondary_hue="indigo",
     neutral_hue="slate",
     font=[gr.themes.GoogleFont("Inter"), "sans-serif"]
 ).set(
@@ -252,8 +252,8 @@ custom_theme = gr.themes.Soft(
     block_background_fill="#ffffff",
     block_border_width="1px",
     block_border_color="#e2e8f0",
-    button_primary_background_fill="#0f766e",
-    button_primary_background_fill_hover="#115e59",
+    button_primary_background_fill="#1d4ed8",
+    button_primary_background_fill_hover="#1e40af",
     panel_background_fill="#ffffff",
 )
 
@@ -285,9 +285,9 @@ div.tabs > div.tab-nav > button {
     transition: all 0.2s ease;
 }
 div.tabs > div.tab-nav > button.selected {
-    color: #0f766e !important;
-    border-bottom: 3px solid #0f766e !important;
-    background: #f0fdfa !important;
+    color: #1d4ed8 !important;
+    border-bottom: 3px solid #1d4ed8 !important;
+    background: #eff6ff !important;
 }
 div.tabs > div.tab-nav > button:hover:not(.selected) {
     background: #f1f5f9 !important;
@@ -343,7 +343,7 @@ def build_ui():
                         with gr.Column(elem_classes="figma-card"):
                             gr.Markdown("""
                             <div style="display: flex; align-items: center; gap: 10px;">
-                                <div style="background: #0f766e; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; font-weight: bold; letter-spacing: -1px;">V</div>
+                                <div style="background: #1d4ed8; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; font-weight: bold; letter-spacing: -1px;">V</div>
                                 <div>
                                     <h2 style="margin: 0; font-size: 1.2rem; font-weight: 700; color: #111827;">VLTCrisis AI System</h2>
                                     <p style="margin: 0; font-size: 0.8rem; color: #6b7280;">Cross-Modal Rationale Transfer · AAAI 2024</p>
@@ -410,7 +410,7 @@ def build_ui():
                         with gr.Column(elem_classes="figma-card"):
                             gr.Markdown("""
                             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
-                                <div style="background: #ccfbf1; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #0f766e; font-weight: bold;">1</div>
+                                <div style="background: #dbeafe; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #1e40af; font-weight: bold;">1</div>
                                 <div>
                                     <h2 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: #111827;">Class Confidence <span style="background: #e2e8f0; color: #475569; font-size: 0.6rem; padding: 2px 6px; border-radius: 4px; margin-left: 8px;">FINAL</span></h2>
                                     <p style="margin: 0; font-size: 0.8rem; color: #6b7280;">What type of disaster is this?</p>
@@ -423,9 +423,9 @@ def build_ui():
                         with gr.Column(elem_classes="figma-card"):
                             gr.Markdown("""
                             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
-                                <div style="background: #0f766e; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">✓</div>
+                                <div style="background: #1d4ed8; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">✓</div>
                                 <div>
-                                    <h2 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: #111827;">Text Analysis <span style="background: #dcfce7; color: #166534; font-size: 0.6rem; padding: 2px 6px; border-radius: 4px; margin-left: 8px;">WORDS</span></h2>
+                                    <h2 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: #111827;">Text Analysis <span style="background: #e0e7ff; color: #3730a3; font-size: 0.6rem; padding: 2px 6px; border-radius: 4px; margin-left: 8px;">WORDS</span></h2>
                                     <p style="margin: 0; font-size: 0.8rem; color: #6b7280;">Which words mattered most for this prediction?</p>
                                 </div>
                             </div>
@@ -436,9 +436,9 @@ def build_ui():
                         with gr.Column(elem_classes="figma-card"):
                             gr.Markdown("""
                             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
-                                <div style="background: #0f766e; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">✓</div>
+                                <div style="background: #1d4ed8; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">✓</div>
                                 <div>
-                                    <h2 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: #111827;">Image Analysis <span style="background: #dbeafe; color: #1d4ed8; font-size: 0.6rem; padding: 2px 6px; border-radius: 4px; margin-left: 8px;">VISUAL</span></h2>
+                                    <h2 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: #111827;">Image Analysis <span style="background: #e0e7ff; color: #3730a3; font-size: 0.6rem; padding: 2px 6px; border-radius: 4px; margin-left: 8px;">VISUAL</span></h2>
                                     <p style="margin: 0; font-size: 0.8rem; color: #6b7280;">Where is the structural damage?</p>
                                 </div>
                             </div>
