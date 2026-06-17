@@ -88,6 +88,40 @@ def train():
                       f"loss_l={loss_l:.4f} "
                       f"loss_r={loss_r:.4f}")
 
+            # ── Save Visual Sample ─────────────────────────────────────────────
+            # Save a sample image and its heatmap at the end of the epoch
+            if step == len(train_loader) - 1:
+                try:
+                    import torchvision
+                    sample_dir = os.path.join(cfg.CHECKPOINT_DIR, "samples")
+                    os.makedirs(sample_dir, exist_ok=True)
+                    
+                    sample_hm = heatmap[0].detach().cpu()
+                    n_patches = len(sample_hm)
+                    grid_size = int(n_patches ** 0.5)
+                    
+                    if grid_size * grid_size == n_patches:
+                        hm_img = sample_hm.view(1, 1, grid_size, grid_size)
+                        # Resize heatmap to match image size (384x384)
+                        hm_img_resized = torch.nn.functional.interpolate(hm_img, size=(cfg.IMAGE_SIZE, cfg.IMAGE_SIZE), mode='bilinear')
+                        
+                        img_tensor = pixel_values[0].detach().cpu()
+                        # ViLT standard un-normalization (approximate for display)
+                        img_tensor = img_tensor * 0.5 + 0.5 
+                        img_tensor = torch.clamp(img_tensor, 0, 1)
+                        
+                        # Add heatmap as a red overlay
+                        overlay = img_tensor.clone()
+                        overlay[0] = torch.clamp(overlay[0] + hm_img_resized[0, 0] * 0.6, 0, 1)
+                        
+                        # Concatenate side by side (Original | Heatmap)
+                        combined = torch.cat([img_tensor, overlay], dim=2)
+                        
+                        save_path = os.path.join(sample_dir, f"epoch_{epoch}_sample.jpg")
+                        torchvision.utils.save_image(combined, save_path)
+                except ImportError:
+                    pass # Skip if torchvision is not available
+
         avg_loss = epoch_loss / len(train_loader)
 
         # ── Evaluation ─────────────────────────────────────────────────────

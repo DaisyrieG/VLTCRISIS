@@ -243,45 +243,84 @@ def check_data(train_csv, dev_csv, test_csv, image_dir):
 
 # ── Build UI ────────────────────────────────────────────────────────────────
 custom_theme = gr.themes.Soft(
-    primary_hue="indigo",
-    secondary_hue="blue",
+    primary_hue="teal",
+    secondary_hue="emerald",
     neutral_hue="slate",
+    font=[gr.themes.GoogleFont("Inter"), "sans-serif"]
 ).set(
-    body_background_fill="#f4f5fa",
+    body_background_fill="#f8fafc",
     block_background_fill="#ffffff",
-    block_border_width="0px",
-    button_primary_background_fill="#6366f1",
-    button_primary_background_fill_hover="#4f46e5",
+    block_border_width="1px",
+    block_border_color="#e2e8f0",
+    button_primary_background_fill="#0f766e",
+    button_primary_background_fill_hover="#115e59",
+    panel_background_fill="#ffffff",
 )
 
 custom_css = """
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 body, .gradio-container {
-    background-color: #f4f5fa !important;
+    background-color: #f8fafc !important;
+    font-family: 'Inter', sans-serif !important;
 }
 .dark {
-    background-color: #f4f5fa !important;
+    background-color: #f8fafc !important;
 }
+
+/* Style tabs to look like a modern dashboard navigation */
+div.tabs > div.tab-nav {
+    border-bottom: 1px solid #e2e8f0 !important;
+    padding-left: 20px !important;
+    background-color: #ffffff !important;
+    padding-top: 15px !important;
+}
+div.tabs > div.tab-nav > button {
+    font-weight: 600 !important;
+    font-size: 0.95rem !important;
+    color: #64748b !important;
+    border: none !important;
+    padding: 10px 20px !important;
+    border-radius: 8px 8px 0 0 !important;
+    transition: all 0.2s ease;
+}
+div.tabs > div.tab-nav > button.selected {
+    color: #0f766e !important;
+    border-bottom: 3px solid #0f766e !important;
+    background: #f0fdfa !important;
+}
+div.tabs > div.tab-nav > button:hover:not(.selected) {
+    background: #f1f5f9 !important;
+}
+
 .figma-card {
     background-color: #ffffff !important;
-    border-radius: 16px !important;
-    border: 1px solid #e5e7eb !important;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03) !important;
-    padding: 20px !important;
+    border-radius: 12px !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important;
+    padding: 24px !important;
     margin-bottom: 16px !important;
 }
 .figma-header {
-    background-color: #ffffff !important;
-    border-radius: 12px !important;
-    padding: 16px !important;
-    margin-bottom: 16px !important;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02) !important;
+    background-color: transparent !important;
+    border-radius: 0px !important;
+    padding: 8px 0px 16px 0px !important;
+    margin-bottom: 8px !important;
+    border: none !important;
+    box-shadow: none !important;
 }
 h3 {
-    color: #4b5563 !important;
-    font-size: 0.85rem !important;
+    color: #475569 !important;
+    font-size: 0.75rem !important;
+    font-weight: 700 !important;
     text-transform: uppercase !important;
     letter-spacing: 0.05em !important;
-    margin-bottom: 8px !important;
+    margin-bottom: 12px !important;
+}
+.gr-button-primary {
+    border-radius: 6px !important;
+    font-weight: 600 !important;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
 }
 """
 
@@ -304,7 +343,7 @@ def build_ui():
                         with gr.Column(elem_classes="figma-card"):
                             gr.Markdown("""
                             <div style="display: flex; align-items: center; gap: 10px;">
-                                <div style="background: #6366f1; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px;">⚡</div>
+                                <div style="background: #0f766e; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; font-weight: bold; letter-spacing: -1px;">V</div>
                                 <div>
                                     <h2 style="margin: 0; font-size: 1.2rem; font-weight: 700; color: #111827;">VLTCrisis AI System</h2>
                                     <p style="margin: 0; font-size: 0.8rem; color: #6b7280;">Cross-Modal Rationale Transfer · AAAI 2024</p>
@@ -371,7 +410,7 @@ def build_ui():
                         with gr.Column(elem_classes="figma-card"):
                             gr.Markdown("""
                             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
-                                <div style="background: #c7d2fe; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #4f46e5; font-weight: bold;">1</div>
+                                <div style="background: #ccfbf1; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #0f766e; font-weight: bold;">1</div>
                                 <div>
                                     <h2 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: #111827;">Class Confidence <span style="background: #e2e8f0; color: #475569; font-size: 0.6rem; padding: 2px 6px; border-radius: 4px; margin-left: 8px;">FINAL</span></h2>
                                     <p style="margin: 0; font-size: 0.8rem; color: #6b7280;">What type of disaster is this?</p>
@@ -384,9 +423,9 @@ def build_ui():
                         with gr.Column(elem_classes="figma-card"):
                             gr.Markdown("""
                             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
-                                <div style="background: #6366f1; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">✓</div>
+                                <div style="background: #0f766e; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">✓</div>
                                 <div>
-                                    <h2 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: #111827;">Text Analysis <span style="background: #f3e8ff; color: #7e22ce; font-size: 0.6rem; padding: 2px 6px; border-radius: 4px; margin-left: 8px;">WORDS</span></h2>
+                                    <h2 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: #111827;">Text Analysis <span style="background: #dcfce7; color: #166534; font-size: 0.6rem; padding: 2px 6px; border-radius: 4px; margin-left: 8px;">WORDS</span></h2>
                                     <p style="margin: 0; font-size: 0.8rem; color: #6b7280;">Which words mattered most for this prediction?</p>
                                 </div>
                             </div>
@@ -397,7 +436,7 @@ def build_ui():
                         with gr.Column(elem_classes="figma-card"):
                             gr.Markdown("""
                             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
-                                <div style="background: #6366f1; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">✓</div>
+                                <div style="background: #0f766e; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">✓</div>
                                 <div>
                                     <h2 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: #111827;">Image Analysis <span style="background: #dbeafe; color: #1d4ed8; font-size: 0.6rem; padding: 2px 6px; border-radius: 4px; margin-left: 8px;">VISUAL</span></h2>
                                     <p style="margin: 0; font-size: 0.8rem; color: #6b7280;">Where is the structural damage?</p>
