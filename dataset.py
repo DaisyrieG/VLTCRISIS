@@ -43,6 +43,8 @@ class CrisisMMDDataset(Dataset):
         img_path = os.path.join(self.image_dir, str(row["image_path"]))
         try:
             image = Image.open(img_path).convert("RGB")
+            # Force resize to square so torch.stack doesn't fail on different aspect ratios
+            image = image.resize((cfg.IMAGE_SIZE, cfg.IMAGE_SIZE))
         except Exception:
             # fallback: blank white image if file missing
             image = Image.new("RGB", (cfg.IMAGE_SIZE, cfg.IMAGE_SIZE), (255, 255, 255))
