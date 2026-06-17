@@ -1,0 +1,18 @@
+# Dataset and Data splits
+Data/
+CrisisMMD_v2.0/
+crisismmd_datasplit_agreed_label/
+
+# Model Weights and Checkpoints
+checkpoints/
+*.pt
+*.pth
+
+# Python Caches
+__pycache__/
+*.pyc
+
+# Environment and IDE
+.env
+.vscode/
+.idea/

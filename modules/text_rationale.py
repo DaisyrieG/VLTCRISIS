@@ -1,0 +1,59 @@
+import torch
+import torch.nn as nn
+from config import Config
+
+cfg = Config()
+
+
+class TextRationaleExtractor(nn.Module):
+    """
+    M3 — Text Rationale Extractor.
+    """
+
+    def __init__(self, hidden_size: int):
+        super().__init__()
+        self.gru = nn.GRU(
+            input_size=hidden_size,
+            hidden_size=cfg.GRU_HIDDEN_SIZE,
+            num_layers=cfg.GRU_LAYERS,
+            batch_first=True,
+            bidirectional=True,
+        )
+        # bidirectional → output is 2 * GRU_HIDDEN_SIZE
+        self.fc = nn.Linear(cfg.GRU_HIDDEN_SIZE * 2, 1)
+        self.sigmoid = nn.Sigmoid()
+
+    def forward(self, token_embeddings: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
+        """
+        Args:
+            token_embeddings: Tensor of shape (B, seq_len, hidden_size)
+            
+        Returns:
+            rationale_probs: Float tensor (B, seq_len) in [0, 1]
+            rationale_preds: Float tensor (B, seq_len) binary {0, 1}
+        """
+        gru_out, _ = self.gru(token_embeddings)
+        # logits  : (B, seq_len, 1) → squeeze → (B, seq_len)
+        logits = self.fc(gru_out).squeeze(-1)
+        rationale_probs = self.sigmoid(logits)
+
+        # Instead of a hard 0.5 threshold, take the top 25% of tokens to guarantee rationales
+        # even if the model is under-trained.
+        B, seq_len = rationale_probs.shape
+        k = max(1, int(0.25 * seq_len))
+        rationale_preds = torch.zeros_like(rationale_probs)
+        for b in range(B):
+            topk_indices = rationale_probs[b].topk(k).indices
+            rationale_preds[b, topk_indices] = 1.0
+
+        return rationale_probs, rationale_preds
+
+
+if __name__ == "__main__":
+    print("Testing TextRationaleExtractor...")
+    model = TextRationaleExtractor(hidden_size=768)
+    x     = torch.randn(2, 40, 768)
+    probs, preds = model(x)
+    print("rationale_probs:", probs.shape)
+    print("rationale_preds:", preds.shape)
+    print("TextRationale OK")
