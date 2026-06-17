@@ -201,7 +201,8 @@ def launch_training(train_csv_obj, dev_csv_obj, img_zip_obj, image_dir, epochs, 
         if not os.path.exists(f):
             missing.append(f)
     if missing:
-        return "Missing files:\n" + "\n".join(missing)
+        yield "Error: Missing dataset files!\n" + "\n".join(missing) + "\n\nDid you forget to upload your dataset?"
+        return
 
     yield "Starting training... (check your terminal for live logs)\n"
 
