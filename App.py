@@ -331,6 +331,7 @@ def build_ui():
                         
                         with gr.Column(elem_classes="figma-card"):
                             gr.Markdown("### EXPLAINABLE AI (XAI) SETTINGS")
+                            gr.Markdown("<p style='font-size: 0.8rem; color: #6b7280; margin-bottom: 5px;'>Lower value = highlights only the most critical damage. Higher value = shows broader context.</p>")
                             sensitivity_slider = gr.Slider(
                                 minimum=0.05, maximum=1.0, value=0.25, step=0.05,
                                 label="Rationale Sensitivity (Top % of patches to keep)"
@@ -361,42 +362,36 @@ def build_ui():
                             gr.Markdown("""
                             <div style="display: flex; justify-content: space-between; align-items: center;">
                                 <div>
-                                    <h2 style="margin: 0; font-size: 1.2rem; font-weight: 700; color: #111827;">VLT Pipeline Architecture</h2>
-                                    <p style="margin: 0; font-size: 0.85rem; color: #6b7280;">Step-by-step cross-modal reasoning trace</p>
+                                    <h2 style="margin: 0; font-size: 1.2rem; font-weight: 700; color: #111827;">Final Prediction & Explanation</h2>
+                                    <p style="margin: 0; font-size: 0.85rem; color: #6b7280;">See what the AI thinks and why</p>
                                 </div>
-                                <div style="color: #6366f1; font-weight: bold; letter-spacing: 2px;">● ● ● <span style="color: #9ca3af; font-size: 0.8rem;">4/4</span></div>
                             </div>
                             """)
                         
                         with gr.Column(elem_classes="figma-card"):
                             gr.Markdown("""
                             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
-                                <div style="background: #6366f1; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">✓</div>
+                                <div style="background: #c7d2fe; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #4f46e5; font-weight: bold;">1</div>
                                 <div>
-                                    <h2 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: #111827;">M1 · Multimodal Preprocessor <span style="background: #e0e7ff; color: #4f46e5; font-size: 0.6rem; padding: 2px 6px; border-radius: 4px; margin-left: 8px;">PREP</span></h2>
-                                    <p style="margin: 0; font-size: 0.8rem; color: #6b7280;">Tokenizes text & normalizes image tensors</p>
+                                    <h2 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: #111827;">Class Confidence <span style="background: #e2e8f0; color: #475569; font-size: 0.6rem; padding: 2px 6px; border-radius: 4px; margin-left: 8px;">FINAL</span></h2>
+                                    <p style="margin: 0; font-size: 0.8rem; color: #6b7280;">What type of disaster is this?</p>
                                 </div>
                             </div>
                             """)
-                            with gr.Row():
-                                with gr.Column():
-                                    gr.Markdown("### TEXT TOKENS")
-                                    out_clean_text = gr.Textbox(label="", lines=4, show_label=False)
-                                with gr.Column():
-                                    gr.Markdown("### NORMALIZED IMAGE")
-                                    out_clean_img = gr.Image(label="", height=200, show_label=False)
-        
+                            out_class = gr.Label(label="", num_top_classes=3, show_label=False)
+                            out_status = gr.Textbox(label="System Log", lines=1, visible=False)
+
                         with gr.Column(elem_classes="figma-card"):
                             gr.Markdown("""
                             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
                                 <div style="background: #6366f1; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">✓</div>
                                 <div>
-                                    <h2 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: #111827;">M2 & M3 · Text Encoder + Rationale <span style="background: #f3e8ff; color: #7e22ce; font-size: 0.6rem; padding: 2px 6px; border-radius: 4px; margin-left: 8px;">TEXT</span></h2>
-                                    <p style="margin: 0; font-size: 0.8rem; color: #6b7280;">BERT cross-attention token saliency extraction</p>
+                                    <h2 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: #111827;">Text Analysis <span style="background: #f3e8ff; color: #7e22ce; font-size: 0.6rem; padding: 2px 6px; border-radius: 4px; margin-left: 8px;">WORDS</span></h2>
+                                    <p style="margin: 0; font-size: 0.8rem; color: #6b7280;">Which words mattered most for this prediction?</p>
                                 </div>
                             </div>
                             """)
-                            gr.Markdown("### ATTENTION HIGHLIGHTS")
+                            gr.Markdown("### IMPORTANT WORDS")
                             out_text_rat = gr.Textbox(label="", lines=3, show_label=False)
         
                         with gr.Column(elem_classes="figma-card"):
@@ -404,32 +399,36 @@ def build_ui():
                             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
                                 <div style="background: #6366f1; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">✓</div>
                                 <div>
-                                    <h2 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: #111827;">M5 · Vision Encoder + GradCAM Rationale <span style="background: #dbeafe; color: #1d4ed8; font-size: 0.6rem; padding: 2px 6px; border-radius: 4px; margin-left: 8px;">IMAGE</span></h2>
-                                    <p style="margin: 0; font-size: 0.8rem; color: #6b7280;">ViT patch-level saliency for structural damage detection</p>
-                                </div>
-                            </div>
-                            """)
-                            gr.Markdown("### GRADCAM OVERLAY")
-                            out_img_rat = gr.Image(label="", height=250, show_label=False)
-        
-                        with gr.Column(elem_classes="figma-card"):
-                            gr.Markdown("""
-                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
-                                <div style="background: #c7d2fe; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #4f46e5; font-weight: bold;">4</div>
-                                <div>
-                                    <h2 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: #111827;">M6 & M7 · Cross-Modal Fusion + Final Prediction <span style="background: #e2e8f0; color: #475569; font-size: 0.6rem; padding: 2px 6px; border-radius: 4px; margin-left: 8px;">OUTPUT</span></h2>
-                                    <p style="margin: 0; font-size: 0.8rem; color: #6b7280;">Rationale-guided multimodal classifier output</p>
+                                    <h2 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: #111827;">Image Analysis <span style="background: #dbeafe; color: #1d4ed8; font-size: 0.6rem; padding: 2px 6px; border-radius: 4px; margin-left: 8px;">VISUAL</span></h2>
+                                    <p style="margin: 0; font-size: 0.8rem; color: #6b7280;">Where is the structural damage?</p>
                                 </div>
                             </div>
                             """)
                             with gr.Row():
                                 with gr.Column():
-                                    gr.Markdown("### MASKED IMAGE (M6)")
-                                    out_masked_img = gr.Image(label="", height=200, show_label=False)
+                                    gr.Markdown("### DAMAGE HEATMAP")
+                                    out_img_rat = gr.Image(label="", height=250, show_label=False)
                                 with gr.Column():
-                                    gr.Markdown("### CLASS CONFIDENCE (M7)")
-                                    out_class = gr.Label(label="", num_top_classes=3, show_label=False)
-                            out_status = gr.Textbox(label="System Log", lines=1, visible=False)
+                                    gr.Markdown("### MASKED IMAGE (STRICT)")
+                                    out_masked_img = gr.Image(label="", height=250, show_label=False)
+
+                        with gr.Accordion("Advanced: Show Technical Preprocessing (M1)", open=False):
+                            with gr.Column(elem_classes="figma-card"):
+                                gr.Markdown("""
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+                                    <div>
+                                        <h2 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: #111827;">M1 · Multimodal Preprocessor</h2>
+                                        <p style="margin: 0; font-size: 0.8rem; color: #6b7280;">Tokenizes text & normalizes image tensors</p>
+                                    </div>
+                                </div>
+                                """)
+                                with gr.Row():
+                                    with gr.Column():
+                                        gr.Markdown("### TEXT TOKENS")
+                                        out_clean_text = gr.Textbox(label="", lines=4, show_label=False)
+                                    with gr.Column():
+                                        gr.Markdown("### NORMALIZED IMAGE")
+                                        out_clean_img = gr.Image(label="", height=200, show_label=False)
         
                 predict_btn.click(
                     fn=predict,
@@ -568,6 +567,6 @@ if __name__ == "__main__":
     demo.launch(
         server_name="0.0.0.0",
         server_port=7860,
-        share=False,         # set True to get a public Gradio link
+        share=True,         # set True to get a public Gradio link
         inbrowser=True,      # auto-opens browser
     )
