@@ -3,11 +3,11 @@ import os
 class Config:
 
     # ── Paths ──────────────────────────────────────────────────────────────
-    DATA_DIR        = "/content/drive/MyDrive/MiniDataset/csv"
+    DATA_DIR        = "/content/drive/MyDrive/CrisisMMD/csv"
     TRAIN_FILE      = os.path.join(DATA_DIR, "train.csv")
     DEV_FILE        = os.path.join(DATA_DIR, "dev.csv")
     TEST_FILE       = os.path.join(DATA_DIR, "test.csv")
-    IMAGE_DIR       = "/content/drive/MyDrive/MiniDataset/images"
+    IMAGE_DIR       = "/content/drive/MyDrive/CrisisMMD/"
     CHECKPOINT_DIR  = "checkpoints"
     LOG_DIR         = "logs"
 
