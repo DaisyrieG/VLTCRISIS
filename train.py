@@ -60,7 +60,7 @@ def train():
             rat_labels     = batch["rationale_labels"].to(cfg.DEVICE)
 
             # forward
-            s2_logits, s1_logits, rat_probs, heatmap = model(
+            s2_logits, s1_logits, rat_probs, heatmap, text_pseudo_labels = model(
                 input_ids=input_ids,
                 attention_mask=attention_mask,
                 token_type_ids=token_type_ids,
@@ -69,9 +69,9 @@ def train():
                 training=True,
             )
 
-            # loss
+            # loss (Notice we ignore `rat_labels` and use `text_pseudo_labels`!)
             total_loss, loss_l, loss_r = loss_fn(
-                s2_logits, s1_logits, rat_probs, rat_labels, class_labels
+                s2_logits, s1_logits, rat_probs, text_pseudo_labels, class_labels
             )
 
             # backward
