@@ -32,7 +32,7 @@ class Config:
     # ── Training ───────────────────────────────────────────────────────────
     BATCH_SIZE      = 8
     NUM_EPOCHS      = 10
-    LEARNING_RATE   = 0.1
+    LEARNING_RATE   = 2e-5
     WEIGHT_DECAY    = 1e-4
     PATIENCE        = 3         # early stopping patience
     ALPHA           = 0.09      # weight of rationale loss: Loss = Loss_l + α·Loss_r
