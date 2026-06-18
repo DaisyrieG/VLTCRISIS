@@ -56,35 +56,28 @@ class ImageRationaleExtractor:
     """
 
     @staticmethod
-    def compute(token_embeddings, patch_embeddings, rationale_preds):
+    def compute(token_embeddings, patch_embeddings, rationale_preds=None):
         B = token_embeddings.shape[0]
         heatmaps = []
+        text_pseudo_labels = []
 
         for b in range(B):
-            # select only predicted rationale tokens
-            mask        = rationale_preds[b].bool()
-            rat_embeds  = token_embeddings[b][mask]        # (n_rat, hidden)
+            # CROSS-MODAL TRANSFER: We use ALL text tokens to align with image patches.
+            tok_embs    = token_embeddings[b]              # (seq_len, hidden)
             patch_embs  = patch_embeddings[b]              # (num_patches, hidden)
 
-            if rat_embeds.shape[0] == 0:
-                # no rationale predicted — zero heatmap
-                heatmaps.append(
-                    torch.zeros(patch_embs.shape[0], device=patch_embs.device)
-                )
-                continue
-
             # normalise embeddings for cosine similarity
-            rat_norm   = F.normalize(rat_embeds, dim=-1)
+            tok_norm   = F.normalize(tok_embs, dim=-1)
             patch_norm = F.normalize(patch_embs,  dim=-1)
 
-            # cost matrix: 1 - cosine_similarity  (n_rat × num_patches)
-            sim_matrix  = rat_norm @ patch_norm.t()        # (n_rat, num_patches)
+            # cost matrix: 1 - cosine_similarity  (seq_len × num_patches)
+            sim_matrix  = tok_norm @ patch_norm.t()        # (seq_len, num_patches)
             cost_matrix = 1.0 - sim_matrix
 
             # run IPOT
-            transport   = ipot(cost_matrix)                # (n_rat, num_patches)
+            transport   = ipot(cost_matrix)                # (seq_len, num_patches)
 
-            # heatmap = max transport weight across rationale tokens per patch
+            # heatmap = max transport weight across text tokens per patch
             patch_scores = transport.max(dim=0).values     # (num_patches,)
 
             # normalise to [0, 1]
@@ -94,7 +87,21 @@ class ImageRationaleExtractor:
 
             heatmaps.append(patch_scores)
 
-        return torch.stack(heatmaps, dim=0)   # (B, num_patches)
+            # Cross-Modal Transfer: Extract text pseudo-labels from the IPOT alignment
+            # Find the max transport weight across image patches per text token
+            tok_scores = transport.max(dim=1).values       # (seq_len,)
+            mn_t, mx_t = tok_scores.min(), tok_scores.max()
+            if mx_t > mn_t:
+                tok_scores = (tok_scores - mn_t) / (mx_t - mn_t + 1e-9)
+            
+            # The top 25% of mathematically aligned tokens become our "ground truth" pseudo-label
+            k = max(1, int(cfg.TOP_PATCH_RATIO * tok_scores.shape[0]))
+            pseudo_label = torch.zeros_like(tok_scores)
+            pseudo_label[tok_scores.topk(k).indices] = 1.0
+            
+            text_pseudo_labels.append(pseudo_label)
+
+        return torch.stack(heatmaps, dim=0), torch.stack(text_pseudo_labels, dim=0)
 
 
 if __name__ == "__main__":

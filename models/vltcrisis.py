@@ -76,10 +76,10 @@ class VLTCrisis(nn.Module):
         # M4 — auxiliary class prediction
         stage1_logits = self.aux_clf(pooler)
 
-        # M5 — image rationale heatmap (no grad needed)
+        # M5 — image rationale heatmap and cross-modal text pseudo-labels
         with torch.no_grad():
-            heatmap = ImageRationaleExtractor.compute(
-                token_embs, patch_embs, rat_preds
+            heatmap, text_pseudo_labels = ImageRationaleExtractor.compute(
+                token_embs, patch_embs
             )
 
         # ── Stage 2: re-encode masked rationales only ──────────────────────
@@ -100,7 +100,7 @@ class VLTCrisis(nn.Module):
         stage2_logits = self.stage2_clf(pooler2)
 
         if training:
-            return stage2_logits, stage1_logits, rat_probs, heatmap
+            return stage2_logits, stage1_logits, rat_probs, heatmap, text_pseudo_labels
         else:
             return stage2_logits, rat_preds, heatmap
 
