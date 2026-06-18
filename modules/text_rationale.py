@@ -37,14 +37,9 @@ class TextRationaleExtractor(nn.Module):
         logits = self.fc(gru_out).squeeze(-1)
         rationale_probs = self.sigmoid(logits)
 
-        # Instead of a hard 0.5 threshold, take the top 25% of tokens to guarantee rationales
-        # even if the model is under-trained.
-        B, seq_len = rationale_probs.shape
-        k = max(1, int(0.25 * seq_len))
-        rationale_preds = torch.zeros_like(rationale_probs)
-        for b in range(B):
-            topk_indices = rationale_probs[b].topk(k).indices
-            rationale_preds[b, topk_indices] = 1.0
+        # Now that we have Cross-Modal Transfer, we don't need the forced 25% hack anymore!
+        # We can just threshold the probabilities at 0.5 like a normal classifier.
+        rationale_preds = (rationale_probs > 0.5).float()
 
         return rationale_probs, rationale_preds
 
