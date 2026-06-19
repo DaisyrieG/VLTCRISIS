@@ -37,61 +37,7 @@ def predict(text, image, checkpoint_path, sensitivity):
     if not text or image is None:
         return "Please provide both text and image.", {}, None, "N/A"
 
-    # --- DEMO BYPASS FOR PAPER EXAMPLES ---
-    # To perfectly match the paper's exact results without requiring a full 10-epoch 7000-sample training run
-    demo_texts = {
-        "Storm Harvey flood victims face displaced alligators": {
-            "class": "affected_individuals",
-            "rationale": "victims face displaced alligators"
-        },
-        "Guaynabo resident Efrain Diaz stands by a bridge washed out by rains carrying debris from Hurricane Maria": {
-            "class": "infrastructure_damage",
-            "rationale": "a bridge washed out by rains carrying debris"
-        },
-        "Video of CU collecting donations for Hurricane Harvey": {
-            "class": "rescue_volunteering_or_donation_effort",
-            "rationale": "CU collecting donations"
-        }
-    }
-    
-    clean_input_text = text.strip()
-    if clean_input_text in demo_texts:
-        target_info = demo_texts[clean_input_text]
-        target_class = target_info["class"]
-        rationale_phrase = target_info["rationale"]
-        
-        # Hardcode probabilities (98% for target, tiny random for others)
-        class_probs = {}
-        for c in cfg.LABEL2ID.keys():
-            if c == target_class:
-                class_probs[c] = 0.98
-            else:
-                class_probs[c] = 0.005
-                
-        # Format text with rationales
-        words = clean_input_text.split()
-        rat_words = rationale_phrase.split()
-        
-        highlighted_text = []
-        for word in words:
-            # Simple match (stripping punctuation for match)
-            clean_word = word.strip(".,!?")
-            if clean_word in rat_words:
-                highlighted_text.append(f"[[{word}]]")
-            else:
-                highlighted_text.append(word)
-                
-        final_text = " ".join(highlighted_text)
-        
-        # Fake heatmap image (just original image for demo)
-        if isinstance(image, str):
-            from PIL import Image
-            img = Image.open(image).convert("RGB")
-        else:
-            img = image
-            
-        return clean_input_text, img, final_text, img, img, class_probs, "Demo Match Loaded Successfully"
-    # --- END DEMO BYPASS ---
+
 
     if not text or text.strip() == "":
         return "Please enter a tweet.", None, "No text provided.", None, None, {}, "—"
@@ -181,7 +127,7 @@ def visualise_heatmap(image, heatmap_tensor):
 
     except Exception as e:
         print("Heatmap visualisation error:", e)
-        return image
+        return image.copy()
 
 
 def visualise_masked_image(image, heatmap_tensor):
@@ -218,7 +164,7 @@ def visualise_masked_image(image, heatmap_tensor):
 
     except Exception as e:
         print("Masked image error:", e)
-        return image
+        return image.copy()
 
 # ── Training launcher ───────────────────────────────────────────────────────
 def launch_training(train_csv_obj, dev_csv_obj, img_zip_obj, image_dir, epochs, batch_size, alpha):
