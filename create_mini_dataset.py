@@ -32,8 +32,17 @@ def create_mini_dataset():
         print(f"Processing {filename}...")
         df = pd.read_csv(csv_path)
         
-        # Take the first N rows
-        df_mini = df.head(row_limit).copy()
+        # Take a balanced sample of N rows total (N/5 per class)
+        if 'label' in df.columns:
+            n_per_class = row_limit // 5
+            # Group by label and sample up to n_per_class (or all if fewer exist)
+            df_mini = df.groupby('label', group_keys=False).apply(
+                lambda x: x.sample(min(len(x), n_per_class), random_state=42)
+            ).copy()
+            # If we didn't reach row_limit, we could sample more from larger classes,
+            # but a perfectly balanced dataset is better for training a small model!
+        else:
+            df_mini = df.head(row_limit).copy()
         
         # Save new CSV
         out_csv_path = os.path.join(out_csv_dir, filename)
