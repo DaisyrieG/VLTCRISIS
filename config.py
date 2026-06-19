@@ -8,8 +8,14 @@ class Config:
     DEV_FILE        = os.path.join(DATA_DIR, "dev.csv")
     TEST_FILE       = os.path.join(DATA_DIR, "test.csv")
     IMAGE_DIR       = "/content/drive/MyDrive/CrisisMMD/"
-    CHECKPOINT_DIR  = "/content/drive/MyDrive/CrisisMMD/checkpoints"
-    LOG_DIR         = "/content/drive/MyDrive/CrisisMMD/logs"
+    
+    # Dynamically select paths based on environment (Colab vs Local)
+    if os.path.exists("/content/drive/MyDrive/CrisisMMD"):
+        CHECKPOINT_DIR  = "/content/drive/MyDrive/CrisisMMD/checkpoints"
+        LOG_DIR         = "/content/drive/MyDrive/CrisisMMD/logs"
+    else:
+        CHECKPOINT_DIR  = "checkpoints"
+        LOG_DIR         = "logs"
 
     # ── ViLT backbone ─────────────────────────────────────────────────────
     VILT_MODEL_NAME = "dandelin/vilt-b32-mlm"

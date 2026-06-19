@@ -79,7 +79,7 @@ class VLTCrisis(nn.Module):
         # M5 — image rationale heatmap and cross-modal text pseudo-labels
         with torch.no_grad():
             heatmap, text_pseudo_labels = ImageRationaleExtractor.compute(
-                token_embs, patch_embs
+                token_embs, patch_embs, attention_mask=attention_mask
             )
 
         # ── Stage 2: re-encode masked rationales only ──────────────────────

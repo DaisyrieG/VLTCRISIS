@@ -56,7 +56,7 @@ class ImageRationaleExtractor:
     """
 
     @staticmethod
-    def compute(token_embeddings, patch_embeddings, rationale_preds=None):
+    def compute(token_embeddings, patch_embeddings, attention_mask=None, rationale_preds=None):
         B = token_embeddings.shape[0]
         heatmaps = []
         text_pseudo_labels = []
@@ -90,14 +90,33 @@ class ImageRationaleExtractor:
             # Cross-Modal Transfer: Extract text pseudo-labels from the IPOT alignment
             # Find the max transport weight across image patches per text token
             tok_scores = transport.max(dim=1).values       # (seq_len,)
-            mn_t, mx_t = tok_scores.min(), tok_scores.max()
+            
+            # Mask out [CLS] (index 0), [SEP], and padding tokens
+            if attention_mask is not None:
+                mask = attention_mask[b].bool()
+                # [CLS] is at 0
+                mask[0] = False
+                # [SEP] is the last True in the mask
+                sep_idx = mask.nonzero().max().item()
+                mask[sep_idx] = False
+                
+                tok_scores = tok_scores.masked_fill(~mask, -1e9)
+            
+            mn_t, mx_t = tok_scores[tok_scores > -1e8].min(), tok_scores[tok_scores > -1e8].max()
             if mx_t > mn_t:
-                tok_scores = (tok_scores - mn_t) / (mx_t - mn_t + 1e-9)
+                tok_scores = torch.where(tok_scores > -1e8, (tok_scores - mn_t) / (mx_t - mn_t + 1e-9), tok_scores)
             
             # The top 25% of mathematically aligned tokens become our "ground truth" pseudo-label
-            k = max(1, int(cfg.TOP_PATCH_RATIO * tok_scores.shape[0]))
+            # We calculate k based on the number of actual text tokens, not the total seq_len
+            if attention_mask is not None:
+                num_text_tokens = mask.sum().item()
+                k = max(1, int(cfg.TOP_PATCH_RATIO * num_text_tokens))
+            else:
+                k = max(1, int(cfg.TOP_PATCH_RATIO * tok_scores.shape[0]))
+                
             pseudo_label = torch.zeros_like(tok_scores)
-            pseudo_label[tok_scores.topk(k).indices] = 1.0
+            if k > 0:
+                pseudo_label[tok_scores.topk(k).indices] = 1.0
             
             text_pseudo_labels.append(pseudo_label)
 
