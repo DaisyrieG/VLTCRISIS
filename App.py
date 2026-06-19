@@ -90,7 +90,7 @@ def predict(text, image, checkpoint_path, sensitivity):
         else:
             img = image
             
-        return final_text, class_probs, img, "Demo Match Loaded Successfully"
+        return clean_input_text, img, final_text, img, img, class_probs, "Demo Match Loaded Successfully"
     # --- END DEMO BYPASS ---
 
     if not text or text.strip() == "":
@@ -627,46 +627,57 @@ def build_ui():
                     with gr.Tab("Evaluate Dataset"):
                         gr.Markdown("Run the trained pipeline across the full dataset to get F1 metrics automatically.")
                         
-                        with gr.Row():
-                            ev_csv  = gr.Textbox(label="Evaluation CSV", value=cfg.TEST_FILE)
-                            ev_imgs = gr.Textbox(label="Image directory", value=cfg.IMAGE_DIR)
-                            
-                        ev_btn    = gr.Button("▶ Run Automatic Evaluation", variant="primary")
-                        ev_output = gr.Textbox(label="Results", lines=5, interactive=False)
-    
-                        def run_eval_ui(csv_path, img_dir, ckpt_path):
-                            yield "Loading model and dataset..."
+                        eval_csv_input  = gr.Textbox(label="CSV File Path (e.g. dev.csv or test.csv)", value=cfg.DEV_FILE)
+                        eval_img_input  = gr.Textbox(label="Image Directory Path", value=cfg.IMAGE_DIR)
+                        eval_ckpt_input = gr.Textbox(label="Checkpoint Path", value=f"{cfg.CHECKPOINT_DIR}/best_model.pt", visible=False)
+                        
+                        eval_btn = gr.Button("Run Automatic Evaluation", variant="primary")
+                        eval_out = gr.Textbox(label="Evaluation Metrics", lines=10)
+                        eval_file_out = gr.File(label="Download Evaluation Metrics CSV")
+                        
+                        def run_eval_ui(csv_file, img_dir, ckpt_path):
+                            yield "Loading model and dataset...", None
                             try:
                                 from dataset import get_dataloader
                                 from evaluate import evaluate_model, comprehensiveness, sufficiency
+                                import pandas as pd
                                 
                                 # Temporarily override config image dir for evaluation
                                 cfg.IMAGE_DIR = img_dir
                                 
-                                status = load_model(ckpt_path)
+                                status = load_model(ckpt_path if ckpt_path else None)
                                 m = get_model()
+                                loader = get_dataloader(csv_file, split="dev", shuffle=False)
                                 
-                                # get_dataloader only takes csv_file, split, shuffle
-                                loader = get_dataloader(csv_path, split="test", shuffle=False)
-                                yield f"Running evaluation on {len(loader.dataset)} samples. Please wait..."
+                                yield f"Running evaluation on {len(loader.dataset)} samples. Please wait...", None
                                 
                                 mf1, tf1 = evaluate_model(m, loader, cfg.DEVICE)
-                                yield f"Step 1/3: Evaluation Complete... Calculating Explainability Metrics (Comprehensiveness)..."
+                                yield f"Step 1/3: Evaluation Complete... Calculating Explainability Metrics (Comprehensiveness)...", None
                                 
                                 comp_score = comprehensiveness(m, loader, cfg.DEVICE)
-                                yield f"Step 2/3: Comprehensiveness: {comp_score:.4f}... Calculating Sufficiency..."
+                                yield f"Step 2/3: Comprehensiveness: {comp_score:.4f}... Calculating Sufficiency...", None
                                 
                                 suff_score = sufficiency(m, loader, cfg.DEVICE)
-                                yield f"Evaluation Complete!\nStatus: {status}\nClassification Macro-F1: {mf1:.4f}\nRationale Token-F1: {tf1:.4f}\nXAI Comprehensiveness: {comp_score:.4f}\nXAI Sufficiency: {suff_score:.4f}"
+                                
+                                # Save to CSV
+                                metrics_data = {
+                                    "Metric": ["Classification Macro-F1", "Rationale Token-F1", "XAI Comprehensiveness", "XAI Sufficiency"],
+                                    "Score": [mf1, tf1, comp_score, suff_score]
+                                }
+                                df = pd.DataFrame(metrics_data)
+                                csv_path = "evaluation_metrics_result.csv"
+                                df.to_csv(csv_path, index=False)
+                                
+                                final_text = f"Evaluation Complete!\nStatus: {status}\nClassification Macro-F1: {mf1:.4f}\nRationale Token-F1: {tf1:.4f}\nXAI Comprehensiveness: {comp_score:.4f}\nXAI Sufficiency: {suff_score:.4f}"
+                                yield final_text, csv_path
                             except Exception as e:
-                                yield f"Error during evaluation: {e}"
+                                yield f"Error during evaluation: {e}", None
     
-                        ev_btn.click(
+                        eval_btn.click(
                             fn=run_eval_ui,
-                            inputs=[ev_csv, ev_imgs, ckpt_input],
-                            outputs=ev_output,
+                            inputs=[eval_csv_input, eval_img_input, eval_ckpt_input],
+                            outputs=[eval_out, eval_file_out],
                         )
-    
                     # ── Tab 5: About ───────────────────────────────────────────────
                     with gr.Tab("About"):
                         gr.Markdown(f"""

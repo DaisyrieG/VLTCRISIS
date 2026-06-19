@@ -4,11 +4,11 @@ class Config:
 
     # ── Paths ──────────────────────────────────────────────────────────────
     # Dynamically select paths based on environment (Colab vs Local)
-    if os.path.exists("/content/drive/MyDrive/CrisisMMD"):
-        DATA_DIR        = "/content/drive/MyDrive/CrisisMMD/csv"
-        IMAGE_DIR       = "/content/drive/MyDrive/CrisisMMD/"
-        CHECKPOINT_DIR  = "/content/drive/MyDrive/CrisisMMD/checkpoints"
-        LOG_DIR         = "/content/drive/MyDrive/CrisisMMD/logs"
+    if os.path.exists("/content/drive/MyDrive/MiniDataset"):
+        DATA_DIR        = "/content/drive/MyDrive/MiniDataset/csv"
+        IMAGE_DIR       = "/content/drive/MyDrive/MiniDataset/images"
+        CHECKPOINT_DIR  = "/content/drive/MyDrive/MiniDataset/checkpoints"
+        LOG_DIR         = "/content/drive/MyDrive/MiniDataset/logs"
     else:
         DATA_DIR        = "MiniDataset/csv"
         IMAGE_DIR       = "MiniDataset/images"
