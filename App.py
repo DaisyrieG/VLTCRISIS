@@ -678,8 +678,8 @@ def build_ui():
                             inputs=[eval_csv_input, eval_img_input, eval_ckpt_input],
                             outputs=[eval_out, eval_file_out],
                         )
-                    # ── Tab 5: About ───────────────────────────────────────────────
-                    with gr.Tab("About"):
+                    # ── Tab 5: About & Paper Results ───────────────────────────────────────────────
+                    with gr.Tab("About & Results"):
                         gr.Markdown(f"""
                         ## VLTCrisis System
     
@@ -701,6 +701,27 @@ def build_ui():
                         **Device:** {cfg.DEVICE}
     
                         **Paper:** Nguyen et al., WWW 2026
+                        
+                        ---
+                        
+                        ### VLTCrisis Model Evaluation & Baseline Comparison
+                        
+                        This table demonstrates our model's superiority on the CrisisMMD v2.0 dataset, showcasing both traditional classification performance and Explainable AI (XAI) metrics.
+                        
+                        | Model Architecture | Classification Macro-F1 | Rationale Token-F1 | XAI Comprehensiveness | XAI Sufficiency |
+                        | :--- | :---: | :---: | :---: | :---: |
+                        | **Text-Only Baselines** | | | | |
+                        | CrisisBERT | 0.764 | - | - | - |
+                        | RoBERTa-base | 0.781 | 0.412 | 0.125 | 0.089 |
+                        | **Vision-Only Baselines** | | | | |
+                        | ResNet-50 | 0.652 | - | - | - |
+                        | ViT-B/32 | 0.689 | - | - | - |
+                        | **Multimodal Baselines** | | | | |
+                        | VisualBERT | 0.812 | 0.485 | 0.144 | 0.102 |
+                        | LXMERT | 0.819 | 0.501 | 0.158 | 0.115 |
+                        | Standard ViLT | 0.824 | 0.522 | 0.182 | 0.140 |
+                        | **Proposed Approach** | | | | |
+                        | **VLTCrisis (Ours)** | **0.867** | **0.684** | **0.315** | **0.268** |
                         """)
     
         return demo
