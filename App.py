@@ -209,7 +209,7 @@ def launch_training(train_csv_obj, dev_csv_obj, img_zip_obj, image_dir, epochs, 
     try:
         from train import train
         train()
-        yield "Training complete! Check checkpoints/best_model.pt"
+        yield "Training complete! Check checkpoints in Google Drive"
     except Exception as e:
         yield f"Training error: {e}"
 
@@ -413,7 +413,7 @@ def build_ui():
                         
                         ckpt_input  = gr.Textbox(
                             label="Checkpoint Path",
-                            value="checkpoints/best_model.pt",
+                            value=f"{cfg.CHECKPOINT_DIR}/best_model.pt",
                             visible=False 
                         )
                         
